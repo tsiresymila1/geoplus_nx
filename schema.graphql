@@ -1,0 +1,3243 @@
+input ActivatePhysicalCardInput {
+  id: ID!
+  identifier: String!
+  redirectUrl: String!
+}
+
+type ActualiteContent implements PostContent {
+  id: ID
+  type: ContentType!
+}
+
+type Album {
+  id: ID!
+  items(pagination: OffsetPaginationInput): PaginatedAlbumItems!
+}
+
+type AlbumContent implements PostContent {
+  id: ID
+  albumId: ID! @deprecated(reason: "29/09/2022 Use id")
+  type: ContentType!
+  # Les 5 premières images
+  preview: [Media!]!
+  images: [Media!]!
+  imagesCount: Int!
+}
+
+input AlbumContentInput {
+  imageIds: [ID!]!
+}
+
+type AlbumItem {
+  id: ID!
+  media: Media!
+}
+
+union Author = MinimalistOrganisme | MinimalistUser
+type AuthResponse {
+  authToken: String
+  apiToken: String!
+  expires: Int!
+}
+
+enum BonplansCommandeLigneType {
+  ARTICLE
+  FRAIS
+  LIVRAISON
+  REMISE
+  ECC
+  SUB
+  ASSURANCE
+}
+
+type BonsplansArticle {
+  id: ID!
+  sku: BonsplansSku!
+  nom: String!
+  detail: String
+  hasDescription: Boolean!
+  description: String
+  quantiteMin: Int
+  quantiteMax: Int
+  prixPublic: Price!
+  prixTTC: Price!
+  carteCadeau: BonsplansArticleCarteCadeau
+  volatiles: [BonsplansVolatile!]
+}
+
+type BonsplansArticleCarteCadeau {
+  valeurFacialeMin: Price
+  valeurFacialeMax: Price
+}
+
+input BonsplansArticleInput {
+  espace: BonsplansEspace!
+  sku: BonsplansSkuInput!
+}
+
+type BonsplansCapabilities {
+  stats: Boolean!
+}
+
+type BonsplansCatalogue {
+  id: ID!
+  nom: String!
+  univers: BonsplansUnivers
+  accroche: String
+  visuel: Media
+  categories: [BonsplansCategory!]
+}
+
+input BonsplansCatalogueInput {
+  espace: BonsplansEspace!
+  id: ID!
+}
+
+input BonsplansCataloguesInput {
+  espace: BonsplansEspace!
+  walletId: ID
+  subventionCompatible: Boolean
+}
+
+input BonsplansCategorieInput {
+  espace: BonsplansEspace!
+  id: ID!
+}
+
+input BonsplansCategoriesInput {
+  espace: BonsplansEspace!
+  catalogueId: ID
+  parentId: ID
+  walletId: ID
+}
+
+type BonsplansCategory {
+  id: ID!
+  catalogueId: ID!
+  parentId: ID
+  level: Int!
+  nom: String!
+}
+
+type BonsplansCommande {
+  id: ID!
+  numeroCommande: ID!
+  libelle: String!
+  espace: BonsplansEspace!
+  statut: BonsplansCommandeStatut!
+  total: Price!
+  totalRemise: Price!
+  lignes: [BonsplansCommandeLigne!]!
+  billets: [BonsplansCommandeBillet!]
+  livraison: BonsplansCommandeLivraison
+  createdAt: DateTimeUtc!
+}
+
+type BonsplansCommandeBillet {
+  id: ID!
+  commandeId: ID!
+  nom: String!
+  utilise: Boolean
+  codeBarres: String
+  codeActivation: String
+  dateExpiration: Date
+  montant: Price
+  url: String
+  info: String
+  produit: BonsplansProduit
+}
+
+input BonsplansCommandeBilletInput {
+  commandeId: ID!
+  billetId: ID!
+}
+
+input BonsplansCommandeBilletsInput {
+  espace: BonsplansEspace
+  walletId: ID
+  utilise: Boolean
+}
+
+input BonsplansCommandeBilletUtiliseInput {
+  commandeId: ID!
+  billetId: ID!
+  utilise: Boolean!
+}
+
+type BonsplansCommandeLigne {
+  id: ID!
+  statut: BonsplansCommandeStatut!
+  type: BonplansCommandeLigneType!
+  quantite: Int!
+  prixUnitaire: Price!
+  libelle: String!
+}
+
+type BonsplansCommandeLivraison {
+  company: String
+  firstname: String!
+  lastname: String!
+  address: String!
+  zipcode: String!
+  city: String!
+  country: String!
+}
+
+input BonsplansCommandesInput {
+  espace: BonsplansEspace
+  walletId: ID
+}
+
+type BonsplansCommandeStats {
+  since: DateTimeUtc!
+  # Nombre de commandes
+  count: Int!
+  # Montant total de commandes validées
+  total: Price!
+  # Montant total des remises
+  totalRemise: Price!
+}
+
+input BonsplansCommandeStatsInput {
+  espace: BonsplansEspace
+}
+
+enum BonsplansCommandeStatut {
+  CREE
+  PAYE
+  VALIDE
+  ANNULE
+}
+
+type BonsplansCoordonnees {
+  nom: String
+  adresse1: String
+  adresse2: String
+  zipcode: String
+  city: String
+  area: String
+  country: String
+  lat: String
+  lng: String
+  website: String
+}
+
+enum BonsplansEspace {
+  CA
+  ECC
+}
+
+type BonsplansLignePanier {
+  uuid: ID!
+  type: BonsplansTypeLignePanier!
+  sku: BonsplansSku
+  quantite: Int!
+  libelle: String!
+  prixUnitaire: Price!
+  total: Price!
+  totalRemise: Price!
+  params: BonsplansLignePanierParams!
+}
+
+type BonsplansLignePanierParams {
+  carteCadeau: BonsplansLignePanierParamsCarteCadeau
+  volatiles: [BonsplansVolatile!]
+}
+
+type BonsplansLignePanierParamsCarteCadeau {
+  valeurFaciale: Price
+}
+
+type BonsplansMarketingTag {
+  id: ID!
+  name: String!
+  type: BonsplansMarketingTagType!
+}
+
+enum BonsplansMarketingTagType {
+  NOUVEAUTE
+  COUP_DE_COEUR
+  IDEE_CADEAU
+  TOP_VENTES
+  EXCLUSIVITE
+  OFFRE_LIMITEE
+  NE_PAS_MANQUER
+}
+
+type BonsplansPanier {
+  espace: BonsplansEspace!
+  lignes: [BonsplansLignePanier!]!
+  livraisons: [BonsplansLignePanier!]!
+  wallets: [BonsplansWalletPanier!]!
+  params: BonsplansPanierParams
+  sousTotal: Price!
+  total: Price!
+  totalRemise: Price!
+}
+
+input BonsplansPanierAddArticleInput {
+  sku: BonsplansSkuInput!
+  quantite: Int!
+  params: BonsplansPanierLigneParamsInput
+}
+
+input BonsplansPanierAddArticlesInput {
+  espace: BonsplansEspace!
+  articles: [BonsplansPanierAddArticleInput!]!
+}
+
+input BonsplansPanierClearInput {
+  espace: BonsplansEspace!
+}
+
+input BonsplansPanierLigneParamsCarteCadeauInput {
+  valeurFaciale: Price
+}
+
+input BonsplansPanierLigneParamsInput {
+  carteCadeau: BonsplansPanierLigneParamsCarteCadeauInput
+  volatiles: [BonsplansVolatileInput!]
+}
+
+type BonsplansPanierParams {
+  livraison: BonsplansPanierParamsLivraison
+}
+
+type BonsplansPanierParamsLivraison {
+  company: String
+  firstname: String!
+  lastname: String!
+  address: String!
+  zipcode: String!
+  city: String!
+  country: String!
+}
+
+input BonsplansPanierRemoveLigneInput {
+  espace: BonsplansEspace!
+  uuid: ID!
+}
+
+type BonsplansPanierTmp {
+  espace: BonsplansEspace!
+  lignes: [BonsplansLignePanier!]!
+  sousTotal: Price!
+  montantWalletsApplique: Price!
+  total: Price!
+  totalRemise: Price!
+}
+
+input BonsplansPanierUpdateLigneInput {
+  espace: BonsplansEspace!
+  uuid: ID!
+  quantite: Int!
+  params: BonsplansPanierLigneParamsInput
+}
+
+input BonsplansPanierUseWalletInput {
+  espace: BonsplansEspace!
+  walletId: ID!
+  utiliser: Boolean!
+  reset: Boolean
+}
+
+type BonsplansProduit {
+  id: ID!
+  nom: String!
+  type: BonsplansProduitType!
+  description: String
+  aide: String
+  coordonnees: BonsplansCoordonnees
+  offre: String
+  marketingTags: [BonsplansMarketingTag!]!
+  logo: Media
+  cover: Media
+  articles: [BonsplansArticle!]
+  searchArticlesFiltres(
+    input: BonsplansProduitSearchArticlesInput
+  ): [BonsplansProduitFiltre!]
+  searchArticles(
+    input: BonsplansProduitSearchArticlesInput!
+  ): [BonsplansArticle!]!
+  offrePartenaire: BonsplansProduitOffrePartenaire
+}
+
+interface BonsplansProduitFiltre {
+  type: BonsplansProduitFiltreType!
+  name: String!
+  label: String
+}
+
+type BonsplansProduitFiltreDate implements BonsplansProduitFiltre {
+  type: BonsplansProduitFiltreType!
+  name: String!
+  label: String
+  min: Date
+  max: Date
+}
+
+type BonsplansProduitFiltreOptions implements BonsplansProduitFiltre {
+  type: BonsplansProduitFiltreType!
+  name: String!
+  label: String
+  values: [BonsplansProduitFiltreOptionsValue!]!
+}
+
+type BonsplansProduitFiltreOptionsValue {
+  value: ID!
+  label: String!
+}
+
+enum BonsplansProduitFiltreType {
+  DATE
+  OPTIONS
+}
+
+input BonsplansProduitFiltreValue {
+  name: String!
+  value: String!
+}
+
+input BonsplansProduitInput {
+  espace: BonsplansEspace!
+  id: ID!
+}
+
+type BonsplansProduitOffrePartenaire {
+  redirectUrl: String!
+}
+
+input BonsplansProduitSearchArticlesInput {
+  filtres: [BonsplansProduitFiltreValue!]!
+}
+
+enum BonsplansProduitType {
+  BON_ACHAT
+  BON_ACHAT_VARIABLE
+  CINEMA
+  PARC
+  SPECTACLE
+  SKI
+  SKIPASS
+  OFFRE_PARTENAIRE
+}
+
+type BonsplansSearchMedia {
+  resolution: Int
+  url: String!
+  resized: [BonsplansSearchMedia!]
+}
+
+type BonsplansSearchProduit {
+  id: ID!
+  nom: String!
+  type: BonsplansProduitType!
+  coordonnees: BonsplansCoordonnees
+  offre: String
+  marketingTags: [BonsplansMarketingTag!]!
+  logo: BonsplansSearchMedia
+  cover: BonsplansSearchMedia
+  highlights: [BonsplansSearchProduitHighlight!]!
+}
+
+type BonsplansSearchProduitHighlight {
+  start: Int!
+  end: Int!
+}
+
+input BonsplansSearchProduitsInput {
+  espace: BonsplansEspace!
+  catalogueId: ID
+  categoryId: ID
+  walletId: ID
+  # Termes de recherche full-text
+  q: String
+}
+
+type BonsplansSku {
+  source: String!
+  productId: ID!
+  articleId: ID!
+}
+
+input BonsplansSkuInput {
+  source: String!
+  productId: ID!
+  articleId: ID!
+}
+
+input BonsplansSuggestProduitsInput {
+  espace: BonsplansEspace!
+  catalogueId: ID
+  categoryId: ID
+  walletId: ID
+  # Termes de recherche full-text
+  q: String!
+  # Nombre de suggestions, 10 par défaut
+  count: Int
+}
+
+type BonsplansTunnelCommandePaiement {
+  url: String!
+  montant: Price!
+}
+
+type BonsplansTunnelCommandeSetLivraison {
+  panier: BonsplansPanier!
+  workflow: Workflow
+}
+
+input BonsplansTunnelCommandeSetLivraisonInput {
+  espace: BonsplansEspace!
+  company: String
+  firstname: String!
+  lastname: String!
+  address: String!
+  zipcode: String!
+  city: String!
+  country: String!
+}
+
+type BonsplansTunnelCommandeValidate {
+  commande: BonsplansCommande!
+  panier: BonsplansPanier!
+  workflow: Workflow
+  paiement: BonsplansTunnelCommandePaiement
+}
+
+input BonsplansTunnelCommandeValidateInput {
+  espace: BonsplansEspace!
+  paiementRedirectUrl: String
+}
+
+enum BonsplansTypeLignePanier {
+  ARTICLE
+  FRAIS
+  LIVRAISON
+}
+
+enum BonsplansUnivers {
+  CULTURE
+  SPORT
+  VACANCES
+  SHOPPING
+}
+
+type BonsplansVolatile {
+  name: String!
+  value: String!
+}
+
+input BonsplansVolatileInput {
+  name: String!
+  value: String!
+}
+
+type BonsplansWalletPanier {
+  id: ID!
+  nom: String!
+  solde: Price!
+  utiliser: Boolean!
+  dateFin: DateTimeUtc!
+  montantApplique: Price!
+  params: BonsplansWalletPanierParams!
+}
+
+type BonsplansWalletPanierParams {
+  montantsAppliques: [BonsplansWalletPanierParamsMontantApplique!]!
+}
+
+type BonsplansWalletPanierParamsMontantApplique {
+  ligne: ID!
+  montantApplique: Price!
+}
+
+type CardCapabilities {
+  showCard: Boolean!
+  showPin: Boolean!
+  activatePhysicalCard: Boolean!
+  lockPhysicalCard: Boolean!
+  unlockPhysicalCard: Boolean!
+  orderPhysicalCard: Boolean!
+}
+
+type CardProviderConsent {
+  uri: String!
+}
+
+interface CardTransaction {
+  id: ID!
+  type: CardTransactionType!
+  nom: String!
+  montant: Price!
+  statut: CardTransactionStatut!
+  date: DateTimeUtc!
+  capabilities: CardTransactionCapabilities!
+}
+
+type CardTransactionCapabilities {
+  requestMerchantEligibility: Boolean!
+}
+
+type CardTransactionInternal implements CardTransaction {
+  id: ID!
+  type: CardTransactionType!
+  nom: String!
+  montant: Price!
+  statut: CardTransactionStatut!
+  date: DateTimeUtc!
+  capabilities: CardTransactionCapabilities!
+}
+
+type CardTransactionMerchant implements CardTransaction {
+  id: ID!
+  type: CardTransactionType!
+  nom: String!
+  montant: Price!
+  statut: CardTransactionStatut!
+  motifRefus: CardTransactionMotifRefus
+  date: DateTimeUtc!
+  merchant: CardTransactionMerchantInfo!
+  capabilities: CardTransactionCapabilities!
+}
+
+type CardTransactionMerchantInfo {
+  mcc: String!
+  merchantName: String!
+  merchantCity: String!
+  merchantCountry: String!
+  merchantCategory: MerchantCategory
+}
+
+enum CardTransactionMotifRefus {
+  SOLDE_INSUFFISANT
+  MARCHANT_REFUSE
+  HORS_ABONNEMENT
+  ECHOUE
+}
+
+enum CardTransactionStatut {
+  PENDING
+  SETTLED
+  REJECTED
+  CANCELED
+  RELEASED
+}
+
+enum CardTransactionType {
+  INTERNAL
+  MERCHANT
+}
+
+type Carte {
+  id: ID!
+  imageBackgroundUrl: String!
+  cardMaskedNumber: String!
+  cardHolder: String!
+  # Date expiration au format MM/YY si présente sinon null
+  expiryDate: String
+  solde: Price!
+  physique: PhysicalCard
+  transactions(pagination: OffsetPaginationInput): PaginatedCardTransactions!
+  capabilities: CardCapabilities!
+}
+
+enum CarteStatut {
+  ONBOARD
+  ONBOARD_USER
+  WAIT
+  PROCESSING
+  ACTIVE
+}
+
+type CarteVacances {
+  statut: CarteStatut!
+  abonnement: CarteVacancesAbonnement
+  carte: Carte
+  solde: Price!
+  personalWallet: WalletsUserPersonalWallet!
+}
+
+type CarteVacancesAbonnement {
+  id: ID!
+  statut: CarteVacancesAbonnementStatut!
+  dateDebut: DateTimeUtc!
+  dateFin: DateTimeUtc!
+  physique: Boolean!
+  user: MinimalistUser!
+}
+
+type CarteVacancesAbonnementCapabilities {
+  read: Boolean!
+  create: Boolean!
+  useOptionsPaiement: Boolean!
+}
+
+type CarteVacancesAbonnementCheque {
+  ORDRE: String!
+  ADRESSE: String!
+  CODE_POSTAL: String!
+  VILLE: String!
+}
+
+type CarteVacancesAbonnementCommande {
+  id: ID!
+  reference: String!
+  statut: CarteVacancesAbonnementCommandeStatut!
+  montant: Price!
+  montantHT: Price!
+  montantTVA: Price!
+  montantAbonnements: Price!
+  montantAbonnementsHT: Price!
+  montantAbonnementsTVA: Price!
+  montantCartes: Price!
+  montantCartesHT: Price!
+  montantCartesTVA: Price!
+  montantRemise: Price!
+  montantRemiseHT: Price!
+  montantRemiseTVA: Price!
+  tauxTVA: Price!
+  # Nombre d'abonnements commandés
+  quantiteAbonnements: Int!
+  # Durée des abonnements en mois
+  duree: Int!
+  physique: Boolean!
+  dateCommande: DateTimeUtc!
+  cheque: CarteVacancesAbonnementCheque!
+  virement: CarteVacancesAbonnementVirement!
+  abonnements(
+    pagination: OffsetPaginationInput
+  ): PaginatedCarteVacancesAbonnements
+  typePaiement: CarteVacancesAbonnementTypePaiement!
+  factureUrl: String
+}
+
+input CarteVacancesAbonnementCommandeAbonnementInput {
+  userId: ID!
+}
+
+input CarteVacancesAbonnementCommandeInput {
+  abonnementOptionId: ID!
+  physique: Boolean!
+  choixAbonnements: Boolean!
+  # Obligatoire si choixAbonnements=true
+  abonnements: [CarteVacancesAbonnementCommandeAbonnementInput!]
+  typePaiement: CarteVacancesAbonnementTypePaiement
+}
+
+input CarteVacancesAbonnementCommandesInput {
+  statut: CarteVacancesAbonnementCommandeStatut
+}
+
+enum CarteVacancesAbonnementCommandeStatut {
+  ATTENTE
+  VALIDE
+  ANNULE
+}
+
+type CarteVacancesAbonnementOption {
+  id: ID!
+  libelle: String!
+  # Durée des abonnements en mois
+  duree: Int!
+  # Nombre de mois offerts
+  moisOfferts: Int!
+  pourcentageRemise: Price!
+}
+
+input CarteVacancesAbonnementOptionsInput {
+  choixAbonnements: Boolean!
+  # Obligatoire si choixAbonnements=true
+  abonnements: [CarteVacancesAbonnementCommandeAbonnementInput!]
+}
+
+type CarteVacancesAbonnementSimulation {
+  coutAbonnementUnitaire: Price!
+  coutCartePhysiqueUnitaire: Price!
+  montant: Price!
+  montantHT: Price!
+  montantTVA: Price!
+  montantAbonnements: Price!
+  montantAbonnementsHT: Price!
+  montantAbonnementsTVA: Price!
+  montantCartes: Price!
+  montantCartesHT: Price!
+  montantCartesTVA: Price!
+  montantRemise: Price!
+  montantRemiseHT: Price!
+  montantRemiseTVA: Price!
+  tauxTVA: Price!
+  # Nombre d'abonnements commandés
+  quantiteAbonnements: Int!
+  # Nombre d'abonnements ignores
+  quantiteAbonnementsIgnores: Int!
+  # Durée des abonnements en mois
+  duree: Int!
+  physique: Boolean!
+  dateCommande: DateTimeUtc!
+  typePaiement: CarteVacancesAbonnementTypePaiement!
+  # Solde du wallet si typePaiement = wallet
+  solde: Price
+}
+
+input CarteVacancesAbonnementSimulationInput {
+  abonnementOptionId: ID!
+  physique: Boolean!
+  choixAbonnements: Boolean!
+  # Obligatoire si choixAbonnements=true
+  abonnements: [CarteVacancesAbonnementCommandeAbonnementInput!]
+  typePaiement: CarteVacancesAbonnementTypePaiement
+}
+
+input CarteVacancesAbonnementsInput {
+  statut: CarteVacancesAbonnementStatut
+}
+
+type CarteVacancesAbonnementStats {
+  statut: CarteVacancesAbonnementStatut!
+  count: Int!
+}
+
+enum CarteVacancesAbonnementStatut {
+  AUCUN
+  VALIDE
+  EXPIRE
+  BIENTOT_EXPIRE
+}
+
+enum CarteVacancesAbonnementTypePaiement {
+  WALLET
+  VIREMENT
+  CHEQUE
+}
+
+type CarteVacancesAbonnementVirement {
+  IBAN: String!
+  BIC: String!
+  BANQUE: String!
+}
+
+input CarteVacancesAlimentationCreateInput {
+  montant: Price!
+  paiementRedirectUrl: String!
+}
+
+type CarteVacancesAlimentationSimulation {
+  frais: Price!
+  soldeUserPersonnalWallet: Price!
+  soldeCarte: Price!
+  montant: Price!
+}
+
+input CarteVacancesAlimentationSimulationInput {
+  montant: Price!
+}
+
+type CarteVacancesTransactionIssue {
+  id: ID!
+  transaction: CardTransaction!
+  commercant: String!
+  description: String
+  statut: CarteVacancesTransactionIssueStatut!
+  dateTraitement: DateTimeUtc
+  createdAt: DateTimeUtc!
+}
+
+input CarteVacancesTransactionIssueInput {
+  transactionId: ID!
+  commercant: String!
+  description: String
+}
+
+enum CarteVacancesTransactionIssueStatut {
+  ATTENTE
+  ACCEPTE
+  REFUSE
+}
+
+input CarteVacancesUsersInput {
+  abonnementValide: Boolean
+  statut: CarteVacancesAbonnementStatut
+}
+
+type CashbackBalance {
+  # Montant total crédit depuis la création de compte
+  creditAmount: Float!
+  # Montant total débit depuis la création de compte
+  debitAmount: Float!
+  # Montant solde disponible depuis la création de compte
+  balanceAmount: Float!
+  # Montant en attente avant d'atteindre le seuil de déblocage
+  waitAmount: Float!
+  # Montant gain depuis la création de compte
+  gainAmount: Float!
+  # Montant paiement depuis la création de compte
+  payAmount: Float!
+  capAmount: Float!
+  # Montant minimal à débloquer
+  thresholdAmount: Float!
+}
+
+type CashbackCategory {
+  id: ID!
+  name: String!
+  subCategories: [CashbackSubCategory!]!
+}
+
+type CashbackOffer {
+  id: ID!
+  brandId: Int
+  brandLogo: String
+  brandName: String
+  brandDescription: String
+  companyId: Int
+  companyName: String
+  shops: [CashbackShop!]!
+  urlRedirectWeb: String!
+  urlRedirectMobile: String!
+  description: String
+  shortDescription: String
+  condition: [String!]!
+  startDate: DateTimeUtc
+  endDate: DateTimeUtc
+  reduction: String
+  unit: CashbackUnitType
+  categories: [CashbackCategory!]!
+  subCategories: [CashbackSubCategory!]!
+}
+
+type CashbackPayment {
+  id: ID!
+  amount: Float
+  iban: String
+  ibic: String
+  firstName: String
+  lastName: String
+  transacState: CashbackTransacState!
+  date: DateTimeUtc!
+}
+
+input CashbackPaymentInput {
+  iban: String!
+  ibic: String!
+  firstName: String!
+  lastName: String!
+  amount: Float
+}
+
+type CashbackShop {
+  id: ID!
+  name: String
+  name2: String
+  logo: String
+  description: String
+  url: String
+  type: String
+  siret: String
+}
+
+type CashbackSubCategory {
+  id: ID!
+  idCat: ID!
+  name: String!
+}
+
+type CashbackTransacState {
+  code: Int!
+  status: String
+  comment: String
+}
+
+type CashbackTransaction {
+  id: ID!
+  amount: Float!
+  # Pourcentage cashback associé
+  percentCashback: Float!
+  # Unité cashback associé
+  unitCashback: CashbackUnitType!
+  offerId: Int!
+  shopId: Int!
+  shopName: String
+  gain: Float!
+  transacState: CashbackTransacState!
+  date: DateTimeUtc!
+}
+
+enum CashbackUnitType {
+  PERCENT
+  EURO
+}
+
+input ChangeEmailSendVerificationInput {
+  email: String!
+}
+
+input ChangeEmailTfaCodeInput {
+  tfaCode: String!
+}
+
+input ChangeEmailVerifyEmailInput {
+  email: String!
+  token: String!
+}
+
+input ChangePasswordInput {
+  oldPassword: String!
+  password: String!
+  passwordConfirmation: String!
+}
+
+input ChangePasswordTfaCodeInput {
+  tfaCode: String!
+}
+
+input ChangePhoneNumberSendVerificationInput {
+  phone: PhoneInput!
+}
+
+input ChangePhoneNumberTfaCodeInput {
+  tfaCode: String!
+}
+
+input ChangePhoneNumberVerifyPhoneNumberInput {
+  phone: PhoneInput!
+  token: String!
+}
+
+input ChangeUserGroupsInput {
+  id: ID!
+  groupIds: [ID!]!
+}
+
+input ChangeUserRoleInput {
+  id: ID!
+  role: UserRole!
+}
+
+type ChatToken {
+  token: String!
+  email: String!
+}
+
+type ClubAvantagesCapabilities {
+  read: Boolean!
+  use: Boolean!
+}
+
+union ClubAvantagesCatalogue = BonsplansCatalogue | ReductionCodeCatalogue
+type Comment {
+  id: ID!
+  content: String!
+  user: MinimalistUser!
+  createdAt: DateTimeUtc!
+  capabilities: CommentCapabilities!
+}
+
+type CommentCapabilities {
+  read: Boolean!
+  create: Boolean!
+  update: Boolean!
+  delete: Boolean!
+  report: Boolean!
+}
+
+input CommentInput {
+  postId: ID!
+  content: String!
+}
+
+type Contact {
+  id: ID!
+  userId: ID
+  firstname: String!
+  lastname: String!
+  dateAnniversaire: String
+  fonction: String!
+  category: ContactCategory
+  lines: [ContactLine!]!
+  capabilities: CRUDCapabilities!
+}
+
+type ContactCategory {
+  id: ID!
+  name: String!
+  position: Int!
+  capabilities: CRUDCapabilities!
+}
+
+input ContactCategoryInput {
+  name: String!
+}
+
+input ContactInput {
+  userId: ID
+  firstname: String!
+  lastname: String!
+  dateAnniversaire: String
+  fonction: String!
+  categoryId: ID
+  lines: [ContactLineInput!]!
+}
+
+type ContactLine {
+  id: ID
+  label: String!
+  type: ContactPropertyType!
+  propertyId: ID!
+  value: String!
+}
+
+input ContactLineInput {
+  value: String!
+  propertyId: ID!
+}
+
+type ContactProperty {
+  id: ID!
+  label: String!
+  position: Int!
+  type: ContactPropertyType!
+  capabilities: CRUDCapabilities!
+}
+
+input ContactPropertyInput {
+  label: String!
+  type: ContactPropertyType!
+}
+
+enum ContactPropertyType {
+  EMAIL
+  PHONE
+  MOBILE_PHONE
+  LOCALISATION
+  SLACK
+  TEAMS
+  OTHER
+}
+
+enum ContentType {
+  ACTUALITE
+  ALBUM
+  EVENT
+  SONDAGE
+  PV_REUNION
+}
+
+# Le code pays au format ISO 3166 Alpha 3
+scalar CountryCodeAlpha3
+
+input CreateOrganismeInput {
+  name: String!
+  address: String
+  zipcode: String!
+  city: String
+  country: String!
+  indicatif: String!
+  effectif: Int!
+}
+
+input CreateUserGroupInput {
+  nom: String!
+}
+
+input CreateUserInput {
+  firstname: String
+  lastname: String
+  email: String!
+  groupIds: [ID!]
+  sendInvitation: Boolean = true
+}
+
+type CRUDCapabilities {
+  read: Boolean!
+  create: Boolean!
+  update: Boolean!
+  delete: Boolean!
+}
+
+# A date string with format `Y-m-d`, e.g. `2011-05-23`.
+scalar Date
+
+# A datetime string with format `Y-m-d H:i:s`, e.g. `2018-05-23 13:43:32`.
+scalar DateTime
+
+# A datetime string in ISO 8601 format in UTC with nanoseconds
+# `YYYY-MM-DDTHH:mm:ss.SSSSSSZ`, e.g. `2020-04-20T16:20:04.000000Z`.
+scalar DateTimeUtc
+
+input DeletePostUserReactionInput {
+  postId: ID!
+}
+
+type DeprecatedAuthor {
+  id: ID
+  displayName: String!
+  avatar: Media
+}
+
+type Device {
+  id: ID!
+  deviceUid: ID!
+  deviceOs: String!
+  deviceModel: String!
+  pushToken: String
+  pushEnabled: Boolean
+  appVersion: String!
+  systemVersion: String!
+  buildNumber: String!
+  createdAt: DateTimeUtc!
+  updatedAt: DateTimeUtc!
+}
+
+input DeviceInput {
+  deviceUid: ID!
+  deviceOs: String!
+  deviceModel: String!
+  pushEnabled: Boolean
+  pushToken: String
+  appVersion: String!
+  systemVersion: String!
+  buildNumber: String!
+}
+
+type EccCapabilities {
+  # Prévisualisation de l'espace chèque cadeau
+  preview: Boolean!
+  # Ajout au panier
+  use: Boolean!
+}
+
+type EventContent implements PostContent {
+  id: ID
+  type: ContentType!
+  eventId: ID! @deprecated(reason: "29/09/2022 Use id")
+  startDate: DateTimeUtc!
+  endDate: DateTimeUtc!
+  participants: [EventParticipant!]!
+}
+
+input EventContentInput {
+  startDate: DateTimeUtc!
+  endDate: DateTimeUtc!
+}
+
+type EventParticipant {
+  user: MinimalistUser!
+  statut: EventParticipationStatut!
+}
+
+enum EventParticipationStatut {
+  PARTICIPE
+  INTERESSE
+  DECLINE
+}
+
+input ExecuteImportInput {
+  id: ID!
+  execute: Boolean!
+}
+
+input FirstConnectionCreateAccountInput {
+  organismeId: ID!
+  userId: ID!
+  token: String!
+  acceptGCU: Boolean!
+  password: String!
+  passwordConfirmation: String!
+}
+
+input FirstConnectionJoinInput {
+  organismeId: ID!
+  userId: ID!
+  token: String!
+}
+
+input FirstConnectionSetAvatarInput {
+  avatarId: ID
+}
+
+input FirstConnectionSetBirthdateInput {
+  birthdate: String
+}
+
+input FirstConnectionSetNameInput {
+  firstname: String!
+  lastname: String!
+}
+
+input FirstConnectionSetupPushInput {
+  deviceUid: ID!
+  pushEnabled: Boolean!
+  pushToken: String
+}
+
+input FirstConnectionVerifyPhoneNumberInput {
+  token: String!
+}
+
+input IdentifiedInput {
+  id: ID!
+}
+
+type Import {
+  id: ID!
+  columns: [ImportedColumn!]!
+  rows: [ImportedRow!]!
+  errors: [ImportRowError!]!
+}
+
+type ImportedColumn {
+  key: String!
+  label: String!
+  display: Boolean!
+}
+
+type ImportedRow {
+  values: [String]!
+}
+
+type ImportError {
+  key: String!
+  message: String!
+}
+
+input ImportInput {
+  mediaId: ID!
+  type: ImportType!
+}
+
+type ImportRowError {
+  row: ImportedRow!
+  errors: [ImportError!]!
+}
+
+enum ImportType {
+  USERS
+  DISTRIBUTION
+}
+
+type Interrupt {
+  action: InterruptAction!
+  # Non null si action == WORKFLOW
+  workflow: WorkflowType
+}
+
+enum InterruptAction {
+  WORKFLOW
+}
+
+input LockPhysicalCardInput {
+  id: ID!
+  reason: LockPhysicalCardReason!
+}
+
+enum LockPhysicalCardReason {
+  LOCK
+  LOST
+  STOLEN
+  DEFECTED
+  NON_RECEIVED
+}
+
+type Me {
+  id: ID!
+  firstname: String!
+  lastname: String!
+  email: String!
+  phone: Phone
+  displayName: String!
+  avatar: Media!
+  isDefaultAvatar: Boolean!
+  incognito: Boolean!
+  dateAnniversaire: String
+  fonction: String
+  about: String
+  # Si renseignée, l'utilisateur a déjà terminé l'on-boarding
+  activatedAt: DateTime
+  created_at: DateTime!
+  updated_at: DateTime!
+  role: UserRole
+  permissions: [Permission!]!
+    @deprecated(reason: "06/06/2022 Use `currentOrganisme.capabilities`")
+  currentOrganisme: Organisme
+  organismes: [Organisme!]!
+  # A récupérer uniquement dès que nécessaire (clic sur le bouton d'aide)
+  chatToken: ChatToken
+}
+
+type Media {
+  id: ID!
+  name: String!
+  mimetype: String!
+  size: Int
+  url: String!
+  resolution: Int
+  resized: [Media!]
+  createdAt: DateTimeUtc
+}
+
+enum MediaTargetType {
+  USER_AVATAR
+  IMPORT
+  ALBUM_ITEM
+  POST_IMAGE
+  PV_DOCUMENT
+}
+
+type MerchantCategory {
+  mcc: String!
+  name: String!
+  icon: String!
+}
+
+type MinimalistOrganisme {
+  id: ID
+  displayName: String!
+  avatar: Media
+}
+
+type MinimalistUser {
+  id: ID
+  displayName: String!
+  nom: String @deprecated
+  email: String!
+  avatar: Media
+}
+
+type MisesEnAvantVedette {
+  id: ID!
+  cta: String!
+  targetType: MisesEnAvantVedetteTargetType!
+    @deprecated(reason: "24/06/2022 Use `target.type`")
+  targetId: ID @deprecated(reason: "24/06/2022 Use `target.id`")
+  targetUrl: String @deprecated(reason: "24/06/2022 Use `target.url`")
+  target: MisesEnAvantVedetteTarget!
+  dateDebut: DateTimeUtc!
+  dateFin: DateTimeUtc!
+  visuel: Media
+  catalogue: BonsplansCatalogue
+  categorie: BonsplansCategory
+  produit: BonsplansProduit
+}
+
+type MisesEnAvantVedetteEmplacement {
+  emplacementType: MisesEnAvantVedetteEmplacementType!
+  emplacementId: ID
+}
+
+enum MisesEnAvantVedetteEmplacementType {
+  HOME
+  CLUBAVANTAGES_HOME
+  CLUBAVANTAGES_CATALOGUE
+  ECC
+  CULTURE
+}
+
+input MisesEnAvantVedettesInput {
+  emplacementType: MisesEnAvantVedetteEmplacementType!
+  emplacementId: ID
+}
+
+type MisesEnAvantVedetteTarget {
+  type: MisesEnAvantVedetteTargetType!
+  id: ID
+  url: String
+}
+
+enum MisesEnAvantVedetteTargetType {
+  BONSPLANS_CATALOGUE
+    @deprecated(reason: "24/06/2022 Use `CLUBAVANTAGES_CATALOGUE`")
+  BONSPLANS_CATEGORIE
+    @deprecated(reason: "24/06/2022 Use `CLUBAVANTAGES_CATEGORIE`")
+  BONSPLANS_PRODUIT
+    @deprecated(reason: "24/06/2022 Use `CLUBAVANTAGES_PRODUIT`")
+  CLUBAVANTAGES_CATALOGUE
+  CLUBAVANTAGES_CATEGORIE
+  CLUBAVANTAGES_PRODUIT
+  CULTURE_CATEGORIE
+  CULTURE_PRODUIT
+  ECC_CATEGORIE
+  ECC_PRODUIT
+  URL
+}
+
+type Mutation {
+  signin(input: SigninInput!): AuthResponse!
+  sso: AuthResponse!
+  refreshAuthToken(input: RefreshAuthTokenInput): AuthResponse!
+  logout: Void
+  sendTfaCode: Void
+  sendResetPassword(input: SendResetPasswordInput!): Void
+  resetPassword(input: ResetPasswordInput!): Void
+  sendEmailAccountVerification(input: SendEmailAccountVerification!): Void
+  sendPhoneNumberAccountVerification(
+    input: SendPhoneNumberAccountVerification!
+  ): Void
+  updateDevice(input: DeviceInput!): Device!
+  uploadMedia(input: UploadInput!): Media!
+  createOrganisme(input: CreateOrganismeInput!): Organisme!
+  updateOrganisme(input: UpdateOrganismeInput!): Organisme!
+  changeCurrentOrganization(id: ID!): Me!
+  createUser(input: CreateUserInput!): User!
+  userExecuteImport(
+    input: ExecuteImportInput!
+    importInput: UserExecuteImportInput!
+  ): Void
+  updateUser(input: UpdateUserInput!): User!
+  deactiveUser(id: ID!): User!
+  reactiveUser(id: ID!): User!
+  deleteUser(id: ID!): User!
+  changeUserRole(input: ChangeUserRoleInput!): User!
+  changeUserGroups(input: ChangeUserGroupsInput!): User!
+  resendInvitation(id: ID!): User!
+  userSendInvitations: UserSendInvitations!
+  createUserGroup(input: CreateUserGroupInput!): UserGroup!
+  updateUserGroup(input: UpdateUserGroupInput!): UserGroup!
+  deleteUserGroup(id: ID!): UserGroup!
+  updateMe(input: UpdateMeInput!): Me!
+  import(input: ImportInput!): Import!
+  executeImport(input: ExecuteImportInput!): Void
+  startWorkflow(input: StartWorkflowInput!): Workflow!
+  changeEmailVerifyTfa(input: ChangeEmailTfaCodeInput!): Void
+  changeEmailSendVerification(input: ChangeEmailSendVerificationInput!): Void
+  changeEmailVerifyEmail(input: ChangeEmailVerifyEmailInput!): Void
+  changePasswordVerifyTfa(input: ChangePasswordTfaCodeInput!): Void
+  changePassword(input: ChangePasswordInput!): Void
+  changePhoneNumberVerifyTfa(input: ChangePhoneNumberTfaCodeInput!): Void
+  changePhoneNumberSendVerification(
+    input: ChangePhoneNumberSendVerificationInput!
+  ): Void
+  changePhoneNumberVerifyPhoneNumber(
+    input: ChangePhoneNumberVerifyPhoneNumberInput!
+  ): Void
+  # Rejoindre l'organisme sans création du compte
+  firstConnectionJoin(input: FirstConnectionJoinInput!): AuthResponse
+  firstConnectionCreateAccount(
+    input: FirstConnectionCreateAccountInput!
+  ): AuthResponse
+  firstConnectionSetName(input: FirstConnectionSetNameInput!): Void
+  firstConnectionSetBirthdate(input: FirstConnectionSetBirthdateInput!): Void
+  firstConnectionSetAvatar(input: FirstConnectionSetAvatarInput!): Void
+  firstConnectionVerifyPhoneNumber(
+    input: FirstConnectionVerifyPhoneNumberInput!
+  ): Void
+  firstConnectionSetupPush(input: FirstConnectionSetupPushInput!): Void
+  firstConnectionProductTourDone: Void
+  signupValidateUserInformations(
+    input: SignupValidateUserInformationsInput!
+  ): Void
+  signupCreateAccount(input: SignupCreateAccountInput!): AuthResponse!
+  signupCreateOrganisme(input: SignupCreateOrganismeInput!): Organisme!
+  signupCreateOrganismeV2(input: SignupCreateOrganismeInput!): Organisme!
+  signupVerifyPhoneNumber(input: SignupVerifyPhoneNumberInput!): Void
+  signupSetupPush(input: SignupSetupPushInput!): Void
+  signupVerifyEmail(input: SignupVerifyEmailInput!): Void
+  signupProductTourDone: Void
+  # Capability ClubAvantages.use nécessaire pour espace CA
+  bonsplansTunnelCommandeSetLivraison(
+    input: BonsplansTunnelCommandeSetLivraisonInput!
+  ): BonsplansTunnelCommandeSetLivraison!
+  # Capability ClubAvantages.use nécessaire pour espace CA
+  bonsplansTunnelCommandeValidate(
+    input: BonsplansTunnelCommandeValidateInput!
+  ): BonsplansTunnelCommandeValidate!
+  declineReport(input: IdentifiedInput!): Report!
+  acceptReport(input: IdentifiedInput!): Report!
+  createContact(input: ContactInput!): Contact!
+  updateContact(input: UpdateContactInput!): Contact!
+  deleteContact(input: IdentifiedInput!): Contact!
+  createContactCategory(input: ContactCategoryInput!): ContactCategory!
+  updateContactCategory(input: UpdateContactCategoryInput!): ContactCategory!
+  deleteContactCategory(input: IdentifiedInput!): ContactCategory!
+  reorderContactCategories(
+    input: ReorderContactCategoriesInput!
+  ): [ContactCategory!]!
+  createContactProperty(input: ContactPropertyInput!): ContactProperty!
+  updateContactProperty(input: UpdateContactPropertyInput!): ContactProperty!
+  deleteContactProperty(input: IdentifiedInput!): ContactProperty!
+  reorderContactProperties(
+    input: ReorderContactPropertiesInput!
+  ): [ContactProperty!]!
+  createPost(input: PostInput!): Post!
+  updatePost(input: UpdatePostInput!): Post!
+  deletePost(input: IdentifiedInput!): Post!
+  participationEvent(input: ParticipationEventInput!): Void
+  reponseSondage(input: ReponseSondageInput!): SondageContent!
+  createComment(input: CommentInput): Comment!
+  updateComment(input: UpdateCommentInput!): Comment!
+  deleteComment(input: IdentifiedInput!): Comment!
+  reportComment(input: IdentifiedInput!): Report!
+  reactPost(input: ReactPostInput!): Post!
+  deletePostUserReaction(input: DeletePostUserReactionInput!): Post!
+  createPostCategory(input: PostCategoryInput!): PostCategory!
+  updatePostCategory(input: UpdatePostCategoryInput!): PostCategory!
+  deletePostCategory(input: IdentifiedInput!): PostCategory!
+  bonsplansCommandeBilletUtilise(
+    input: BonsplansCommandeBilletUtiliseInput!
+  ): BonsplansCommandeBillet!
+  bonsplansPanierAddArticlesTmp(
+    input: BonsplansPanierAddArticlesInput!
+  ): BonsplansPanierTmp!
+  # Capability ClubAvantages.use nécessaire pour espace CA, Ecc.use pour espace ECC
+  bonsplansPanierAddArticles(
+    input: BonsplansPanierAddArticlesInput!
+  ): BonsplansPanier!
+  # Capability ClubAvantages.use nécessaire pour espace CA, Ecc.use pour espace ECC
+  bonsplansPanierUpdateLigne(
+    input: BonsplansPanierUpdateLigneInput!
+  ): BonsplansPanier!
+  bonsplansPanierRemoveLigne(
+    input: BonsplansPanierRemoveLigneInput!
+  ): BonsplansPanier!
+  bonsplansPanierUseWallet(
+    input: BonsplansPanierUseWalletInput!
+  ): BonsplansPanier!
+  bonsplansPanierClear(input: BonsplansPanierClearInput!): BonsplansPanier!
+  createCashbackPayment(input: CashbackPaymentInput): CashbackPayment!
+  carteVacancesAbonnementCommandeCreate(
+    input: CarteVacancesAbonnementCommandeInput!
+  ): CarteVacancesAbonnementCommande!
+  carteVacancesAlimentationCreate(
+    input: CarteVacancesAlimentationCreateInput!
+  ): WalletsPaiement!
+  carteVacancesTransactionIssueCreate(
+    input: CarteVacancesTransactionIssueInput!
+  ): CarteVacancesTransactionIssue!
+  onboardCarteVacances(input: OnboardCarteVacancesInput!): CardProviderConsent
+  onboardCarteVacancesUser(
+    input: OnboardCarteVacancesUserInput!
+  ): CardProviderConsent
+  activatePhysicalCard(input: ActivatePhysicalCardInput!): CardProviderConsent!
+  showCard(input: ShowCardInput!): CardProviderConsent!
+  showPin(input: ShowPinInput!): CardProviderConsent!
+  lockPhysicalCard(input: LockPhysicalCardInput!): CarteVacances!
+  unlockPhysicalCard(input: UnlockPhysicalCardInput!): CardProviderConsent!
+  createWalletsDistribution(
+    input: WalletsDistributionInput!
+  ): WalletsDistribution!
+  createWalletsProvisionning(
+    input: WalletsProvisionningInput
+  ): WalletsProvisionning!
+    @deprecated(reason: "17/08/2022 Use `createWalletsProvisionningEcc`")
+  createWalletsProvisionningCulture(
+    input: WalletsProvisionningCultureInput
+  ): WalletsProvisionning!
+  createWalletsProvisionningEcc(
+    input: WalletsProvisionningEccInput
+  ): WalletsProvisionning!
+  createWalletsProvisionningSub(
+    input: WalletsProvisionningSubInput
+  ): WalletsProvisionning!
+  walletsUserActivateWallet(
+    input: WalletsUserActivateWalletInput!
+  ): WalletsUserWallet!
+  walletsUserSendActivationCode(
+    input: WalletsUserSendActivationCodeInput!
+  ): Void
+  walletsUserPartageWallet(
+    input: WalletsUserPartageWalletInput!
+  ): WalletsUserWalletPartage!
+}
+
+type OffsetPagination {
+  # Number of items in the current page.
+  count: Int!
+  # Index of the current offset.
+  offset: Int!
+  # Index of the first item in the current page.
+  firstItem: Int
+  # Index of the last item in the current page.
+  lastItem: Int
+  # Number of items asked.
+  limit: Int!
+  # Total number of items.
+  total: Int!
+}
+
+input OffsetPaginationInput {
+  limit: Int
+  offset: Int
+}
+
+input OnboardCarteVacancesAdresseLivraisonInput {
+  address: String!
+  addressComplement: String
+  zipcode: String!
+  city: String!
+  country: CountryCodeAlpha3!
+}
+
+input OnboardCarteVacancesInput {
+  birthdate: Date!
+  # null si distribution faite avec physique false
+  adresseLivraison: OnboardCarteVacancesAdresseLivraisonInput
+  redirectUrl: String!
+}
+
+input OnboardCarteVacancesUserInput {
+  redirectUrl: String!
+}
+
+enum Order {
+  ASC
+  DESC
+}
+
+# Allows ordering a list of records.
+input OrderByClause {
+  # The column that is used for ordering.
+  column: String!
+  # The direction that is used for ordering.
+  order: SortOrder!
+}
+
+# Aggregate functions when ordering by a relation without specifying a column.
+enum OrderByRelationAggregateFunction {
+  # Amount of items.
+  COUNT
+}
+
+# Aggregate functions when ordering by a relation that may specify a column.
+enum OrderByRelationWithColumnAggregateFunction {
+  # Average.
+  AVG
+  # Minimum.
+  MIN
+  # Maximum.
+  MAX
+  # Sum.
+  SUM
+  # Amount of items.
+  COUNT
+}
+
+type Organisme {
+  id: ID!
+  name: String!
+  address: String!
+  zipcode: String!
+  city: String!
+  country: String!
+  indicatif: String!
+  capabilities: RootCapabilities!
+  config: OrganismeConfig!
+  avatar: Media!
+}
+
+enum OrganismeAbonnementType {
+  FREE
+  BASIC
+  FULL
+}
+
+type OrganismeCapabilities {
+  update: Boolean!
+  createChild: Boolean!
+}
+
+type OrganismeConfig {
+  organisme: OrganismeOrganismeConfig!
+  wallet: WalletsOrganismeConfig!
+}
+
+type OrganismeOrganismeConfig {
+  hasMultiOrganisme: Boolean!
+  timezone: String!
+}
+
+# Information about pagination using a Relay style cursor connection.
+type PageInfo {
+  # When paginating forwards, are there more items?
+  hasNextPage: Boolean!
+  # When paginating backwards, are there more items?
+  hasPreviousPage: Boolean!
+  # The cursor to continue paginating backwards.
+  startCursor: String
+  # The cursor to continue paginating forwards.
+  endCursor: String
+  # Total number of nodes in the paginated connection.
+  total: Int!
+  # Number of nodes in the current page.
+  count: Int!
+  # Index of the current page.
+  currentPage: Int!
+  # Index of the last available page.
+  lastPage: Int!
+}
+
+type PaginatedAlbumItems {
+  data: [AlbumItem!]!
+  pagination: OffsetPagination!
+}
+
+type PaginatedBonsplansCommandeBillets {
+  data: [BonsplansCommandeBillet!]!
+  pagination: OffsetPagination!
+}
+
+type PaginatedBonsplansCommandes {
+  data: [BonsplansCommande!]!
+  pagination: OffsetPagination!
+}
+
+type PaginatedBonsplansSearchProduit {
+  data: [BonsplansSearchProduit!]!
+  pagination: OffsetPagination!
+}
+
+type PaginatedCardTransactions {
+  data: [CardTransaction!]!
+  pagination: OffsetPagination!
+}
+
+type PaginatedCarteVacancesAbonnementCommandes {
+  data: [CarteVacancesAbonnementCommande!]!
+  pagination: OffsetPagination!
+}
+
+type PaginatedCarteVacancesAbonnements {
+  data: [CarteVacancesAbonnement!]!
+  pagination: OffsetPagination!
+}
+
+type PaginatedCashbackOffers {
+  data: [CashbackOffer!]!
+  pagination: OffsetPagination!
+}
+
+type PaginatedCashbackPayments {
+  data: [CashbackPayment!]!
+  pagination: OffsetPagination!
+}
+
+type PaginatedCashbackTransactions {
+  data: [CashbackTransaction!]!
+  pagination: OffsetPagination!
+}
+
+type PaginatedComments {
+  data: [Comment!]!
+  pagination: OffsetPagination!
+}
+
+type PaginatedContacts {
+  data: [Contact!]!
+  pagination: OffsetPagination!
+}
+
+type PaginatedMisesEnAvants {
+  data: [Post!]!
+  pagination: OffsetPagination!
+}
+
+type PaginatedPosts {
+  data: [Post!]!
+  pagination: OffsetPagination!
+}
+
+type PaginatedReductionCodes {
+  data: [ReductionCode!]!
+  pagination: OffsetPagination!
+}
+
+type PaginatedReductionCodeShops {
+  data: [ReductionCodeShop!]!
+  pagination: OffsetPagination!
+}
+
+type PaginatedReports {
+  data: [Report!]!
+  pagination: OffsetPagination!
+}
+
+type PaginatedSondageParticipations {
+  data: [SondageParticipation!]!
+  pagination: OffsetPagination!
+}
+
+type PaginatedUsers {
+  data: [User!]!
+  pagination: OffsetPagination!
+}
+
+type PaginatedWalletsDistributionMotifs {
+  data: [WalletsDistributionMotif!]!
+  pagination: OffsetPagination!
+}
+
+type PaginatedWalletsDistributions {
+  data: [WalletsDistribution!]!
+  pagination: OffsetPagination!
+}
+
+type PaginatedWalletsMouvements {
+  data: [WalletsOrganismeWalletMvt!]!
+  pagination: OffsetPagination!
+}
+
+type PaginatedWalletsProvisionnings {
+  data: [WalletsProvisionning!]!
+  pagination: OffsetPagination!
+}
+
+type PaginatedWalletsUserWallets {
+  data: [WalletsUserWallet!]!
+  pagination: OffsetPagination!
+}
+
+# Information about pagination using a fully featured paginator.
+type PaginatorInfo {
+  # Number of items in the current page.
+  count: Int!
+  # Index of the current page.
+  currentPage: Int!
+  # Index of the first item in the current page.
+  firstItem: Int
+  # Are there more pages after this one?
+  hasMorePages: Boolean!
+  # Index of the last item in the current page.
+  lastItem: Int
+  # Index of the last available page.
+  lastPage: Int!
+  # Number of items per page.
+  perPage: Int!
+  # Number of total available items.
+  total: Int!
+}
+
+input ParticipationEventInput {
+  eventId: ID!
+  statut: EventParticipationStatut!
+}
+
+type Permission {
+  subject: String!
+  action: [String!]!
+}
+
+type Phone {
+  indicatif: String!
+  number: String!
+}
+
+input PhoneInput {
+  indicatif: String!
+  number: String!
+}
+
+type PhysicalCard {
+  blocked: Boolean!
+  canceled: Boolean!
+  deliveryUrl: String
+  deliveryDate: DateTimeUtc
+}
+
+type Post {
+  id: ID!
+  author: DeprecatedAuthor!
+  authorV2: Author!
+  categoryId: ID
+    @deprecated(
+      reason: "05/10/2022 Il vaut mieux utiliser la propriété category"
+    )
+  category: PostCategory
+  group: UserGroup
+  title: String
+    @deprecated(reason: "28/09/2022 Le post n'affiche plus que textContent")
+  textContent: String
+  content: PostContent!
+  interactions: PostInteractions!
+  reactions: [Reaction!]!
+  comments: [Comment!]!
+  userReaction: Reaction
+  images: [Media!]! @deprecated
+  image: Media
+  publish: Boolean!
+  status: PostStatus!
+  publishedAt: DateTimeUtc
+  capabilities: PostCapabilities!
+}
+
+type PostCapabilities {
+  read: Boolean!
+  create: Boolean!
+  update: Boolean!
+  delete: Boolean!
+  commentV2: CommentCapabilities!
+  comment: Boolean! @deprecated(reason: "27/09/2022 Use `commentV2.create`")
+  reaction: CRUDCapabilities!
+  content: PostContentCapabilities!
+}
+
+type PostCategory {
+  id: ID!
+  label: String!
+  capabilities: CRUDCapabilities!
+}
+
+input PostCategoryInput {
+  label: String!
+}
+
+interface PostContent {
+  id: ID
+  type: ContentType!
+}
+
+type PostContentCapabilities {
+  actualite: PostContentCapability!
+  album: PostContentCapability!
+  event: PostContentCapability!
+  sondage: PostSondageContentCapability!
+  pvReunion: PostContentCapability!
+}
+
+type PostContentCapability {
+  create: Boolean!
+}
+
+input PostContentInput {
+  type: ContentType!
+  album: AlbumContentInput
+  event: EventContentInput
+  sondage: SondageContentInput
+  pvReunion: PvReunionContentInput
+}
+
+input PostInput {
+  title: String
+  textContent: String
+  categoryId: ID
+  groupId: ID
+  content: PostContentInput
+  imageId: ID
+  publish: Boolean = true
+  publishedAt: DateTimeUtc
+}
+
+type PostInteractions {
+  comment: Int!
+  like: Int!
+  love: Int!
+  praise: Int!
+  surprised: Int!
+  thinking: Int!
+}
+
+type PostInteractionsSubscription {
+  postId: ID!
+  interactions: PostInteractions!
+}
+
+type PostSondageContentCapability {
+  create: Boolean!
+  respond: Boolean!
+}
+
+enum PostStatus {
+  BROUILLON
+  PLANIFIE
+  PUBLIE
+}
+
+scalar Price
+
+type PvReunionContent implements PostContent {
+  id: ID!
+  type: ContentType!
+  date: DateTimeUtc
+    @deprecated(reason: "Cela devient le type DocumentContent donc pas de date")
+  documents: [Media!]!
+}
+
+input PvReunionContentInput {
+  date: DateTimeUtc
+  documentIds: [ID!]!
+}
+
+type Query {
+  interrupt: Interrupt
+  signupInvitation(input: SignupInvitationInput): SignupInvitation!
+  ssoAuthToken: String!
+  clubAvantagesCatalogues: [ClubAvantagesCatalogue!]!
+  organisme(id: ID!): Organisme
+  users(input: UsersInput, pagination: OffsetPaginationInput): PaginatedUsers!
+  usersExport(input: UsersInput): Media!
+  user(id: ID): User
+  userGroups: [UserGroup!]!
+  userGroup(id: ID!): UserGroup!
+  userStats: UserStats!
+  me: Me!
+  importSample(type: ImportType!): Media!
+  workflow(id: ID!): Workflow
+  reports(order: Order, pagination: OffsetPaginationInput): PaginatedReports!
+  report(input: IdentifiedInput!): Report!
+  contacts(
+    categoryId: ID
+    order: Order
+    pagination: OffsetPaginationInput
+  ): PaginatedContacts!
+  contact(id: ID!): Contact
+  contactCategories: [ContactCategory!]!
+  contactProperties: [ContactProperty!]!
+  posts(
+    categoryId: ID
+    status: PostStatus = PUBLIE
+    order: Order
+    pagination: OffsetPaginationInput
+  ): PaginatedPosts!
+  post(input: IdentifiedInput!): Post!
+  album(input: IdentifiedInput!): Album!
+  misesEnAvants(pagination: OffsetPaginationInput): PaginatedMisesEnAvants!
+  postCategories: [PostCategory!]!
+  postCategory(input: IdentifiedInput!): PostCategory!
+  comments(postId: ID!, pagination: OffsetPaginationInput): PaginatedComments!
+  bonsplansCatalogues(input: BonsplansCataloguesInput!): [BonsplansCatalogue!]!
+  bonsplansCatalogue(input: BonsplansCatalogueInput!): BonsplansCatalogue!
+  bonsplansCategories(input: BonsplansCategoriesInput!): [BonsplansCategory!]!
+  bonsplansCategorie(input: BonsplansCategorieInput!): BonsplansCategory!
+  bonsplansSearchProduits(
+    input: BonsplansSearchProduitsInput!
+    pagination: OffsetPaginationInput
+  ): PaginatedBonsplansSearchProduit!
+  bonsplansSuggestProduits(
+    input: BonsplansSuggestProduitsInput!
+  ): [BonsplansSearchProduit!]!
+  bonsplansProduit(input: BonsplansProduitInput!): BonsplansProduit!
+  bonsplansArticle(input: BonsplansArticleInput!): BonsplansArticle!
+  bonsplansCommandes(
+    input: BonsplansCommandesInput
+    pagination: OffsetPaginationInput
+  ): PaginatedBonsplansCommandes!
+  bonsplansCommande(input: IdentifiedInput!): BonsplansCommande!
+  bonsplansCommandeBillets(
+    input: BonsplansCommandeBilletsInput
+    pagination: OffsetPaginationInput
+  ): PaginatedBonsplansCommandeBillets!
+  bonsplansCommandeBillet(
+    input: BonsplansCommandeBilletInput!
+  ): BonsplansCommandeBillet!
+  bonsplansCommandeStats(
+    input: BonsplansCommandeStatsInput!
+  ): BonsplansCommandeStats!
+  bonsplansCommandeAdminStats(
+    input: BonsplansCommandeStatsInput!
+  ): BonsplansCommandeStats!
+  bonsplansPanier(espace: BonsplansEspace!): BonsplansPanier!
+  cashbackCategories: [CashbackCategory!]!
+  cashbackSubCategories: [CashbackSubCategory!]!
+  cashbackOffers(
+    categoryId: ID
+    subCategoryId: ID
+    pagination: OffsetPaginationInput
+  ): PaginatedCashbackOffers!
+  cashbackOffer(input: IdentifiedInput!): CashbackOffer!
+  cashbackPayments: PaginatedCashbackPayments!
+  cashbackPayment(input: IdentifiedInput!): CashbackPayment!
+  cashbackTransactions: PaginatedCashbackTransactions!
+  cashbackTransaction(input: IdentifiedInput!): CashbackTransaction!
+  cashbackBalance: CashbackBalance!
+  reductionCodeCatalogue: ReductionCodeCatalogue!
+  reductionCodeCategories: [ReductionCodeCategory!]!
+  reductionCodeSubCategories: [ReductionCodeSubCategory!]!
+  reductionCodes(
+    input: ReductionCodesInput
+    pagination: OffsetPaginationInput
+  ): PaginatedReductionCodes!
+  reductionCode(input: IdentifiedInput!): ReductionCode!
+  reductionCodeShops(
+    input: ReductionCodeShopsInput
+    pagination: OffsetPaginationInput
+  ): PaginatedReductionCodeShops!
+  reductionCodeShop(input: IdentifiedInput!): ReductionCodeShop!
+  walletsAdvantages: [WalletsAdvantage!]!
+  carteVacances: CarteVacances
+  carteVacancesTransaction(input: IdentifiedInput!): CardTransaction!
+  carteVacancesAbonnementCommande(
+    input: IdentifiedInput!
+  ): CarteVacancesAbonnementCommande!
+  carteVacancesAbonnementCommandes(
+    input: CarteVacancesAbonnementCommandesInput
+    pagination: OffsetPaginationInput
+  ): PaginatedCarteVacancesAbonnementCommandes!
+  carteVacancesAbonnements(
+    input: CarteVacancesAbonnementsInput
+    pagination: OffsetPaginationInput
+  ): PaginatedCarteVacancesAbonnements!
+  carteVacancesAbonnementStats: [CarteVacancesAbonnementStats!]
+  carteVacancesAbonnementOptions(
+    input: CarteVacancesAbonnementOptionsInput
+  ): [CarteVacancesAbonnementOption!]!
+  carteVacancesAbonnementSimulation(
+    input: CarteVacancesAbonnementSimulationInput!
+  ): CarteVacancesAbonnementSimulation!
+  carteVacancesAlimentationSimulation(
+    input: CarteVacancesAlimentationSimulationInput!
+  ): CarteVacancesAlimentationSimulation!
+  walletsDistributions(
+    input: WalletsDistributionsInput
+    pagination: OffsetPaginationInput
+  ): PaginatedWalletsDistributions!
+  walletsDistributionMotifs(
+    pagination: OffsetPaginationInput
+  ): PaginatedWalletsDistributionMotifs!
+  walletsDistributionECCMotifs(
+    pagination: OffsetPaginationInput
+  ): PaginatedWalletsDistributionMotifs!
+  walletsDistributionCultureMotif: WalletsDistributionMotif!
+  walletsDistribution(input: IdentifiedInput!): WalletsDistribution!
+  walletsDistributionMotif(input: IdentifiedInput!): WalletsDistributionMotif!
+  simulateWalletsDistribution(
+    input: WalletsDistributionInput!
+  ): WalletsDistributionSimulation!
+    @deprecated(reason: "24/11/2022 Use `walletsDistributionSimulation`")
+  walletsDistributionSimulation(
+    input: WalletsDistributionSimulationInput!
+  ): WalletsDistributionSimulation!
+  walletsOrganismeWallet: WalletsOrganismeWallet!
+  walletsProvisionnings(
+    input: WalletsProvisionningsInput
+    pagination: OffsetPaginationInput
+  ): PaginatedWalletsProvisionnings!
+  walletsProvisionning(input: IdentifiedInput!): WalletsProvisionning!
+  walletsDistributionUserWallets(
+    input: IdentifiedInput!
+    pagination: OffsetPaginationInput
+  ): PaginatedWalletsUserWallets!
+  walletsUserWallets(
+    input: WalletsUserWalletsInput
+    pagination: OffsetPaginationInput
+  ): PaginatedWalletsUserWallets!
+  walletsAllUserWallets(
+    input: WalletsAllUserWalletsInput
+    pagination: OffsetPaginationInput
+  ): PaginatedWalletsUserWallets!
+  walletsUserWallet(input: IdentifiedInput!): WalletsUserWallet!
+  misesEnAvantVedettes(
+    input: MisesEnAvantVedettesInput!
+  ): [MisesEnAvantVedette!]!
+  misesEnAvantVedette(input: IdentifiedInput!): MisesEnAvantVedette!
+}
+
+type Reaction {
+  id: ID!
+  type: ReactionType!
+  user: MinimalistUser!
+  capabilities: CRUDCapabilities!
+}
+
+enum ReactionType {
+  LIKE
+  LOVE
+  PRAISE
+  SURPRISED
+  THINKING
+}
+
+input ReactPostInput {
+  postId: ID!
+  type: ReactionType!
+}
+
+type ReductionCode {
+  id: ID!
+  brand: String!
+  brandLogoUrl: String
+  # Capability ClubAvantages.use nécessaire
+  urlRedirectWeb: String!
+  # Capability ClubAvantages.use nécessaire
+  urlRedirectMobile: String!
+  description: String
+  shortDescription: String
+  conditions: [String!]!
+  startDate: DateTimeUtc
+  endDate: DateTimeUtc
+  reduction: String!
+  unit: ReductionCodeUnitType!
+  offre: String
+  # Capability ClubAvantages.use nécessaire
+  codeReduction: String
+  shop: ReductionCodeShop!
+}
+
+type ReductionCodeCatalogue {
+  nom: String!
+  accroche: String
+  visuel: Media
+}
+
+type ReductionCodeCategory {
+  id: ID!
+  name: String!
+  subCategories: [ReductionCodeSubCategory!]!
+}
+
+type ReductionCodeShop {
+  id: ID!
+  name: String!
+  logoUrl: String
+  description: String
+  reductions: [ReductionCode!]!
+}
+
+input ReductionCodeShopsInput {
+  categoryId: ID
+  subCategoryId: ID
+}
+
+input ReductionCodesInput {
+  categoryId: ID
+  subCategoryId: ID
+}
+
+type ReductionCodeSubCategory {
+  id: ID!
+  name: String!
+}
+
+enum ReductionCodeUnitType {
+  PERCENT
+  EURO
+}
+
+input RefreshAuthTokenInput {
+  organismeId: ID!
+}
+
+input ReorderContactCategoriesInput {
+  categoryIds: [ID!]!
+}
+
+input ReorderContactPropertiesInput {
+  propertyIds: [ID!]!
+}
+
+input ReponseSondageInput {
+  sondageId: ID!
+  propositionId: ID!
+}
+
+type Report {
+  id: ID!
+  reportable: Reportable!
+  reportedAt: DateTimeUtc!
+}
+
+union Reportable = Comment
+type ReportCapabilities {
+  read: Boolean!
+}
+
+input ResetPasswordInput {
+  token: String!
+  email: String!
+  password: String!
+  passwordConfirmation: String!
+}
+
+type RootCapabilities {
+  Organisme: OrganismeCapabilities!
+  ClubAvantages: ClubAvantagesCapabilities!
+  Bonsplans: BonsplansCapabilities!
+  Contact: CRUDCapabilities!
+  ContactCategory: CRUDCapabilities!
+  ContactProperty: CRUDCapabilities!
+  DistributionCulture: CRUDCapabilities!
+  DistributionEcc: CRUDCapabilities!
+  DistributionSub: CRUDCapabilities!
+  DistributionVacances: CRUDCapabilities!
+  CarteVacancesAbonnement: CarteVacancesAbonnementCapabilities!
+  # Complexe à calculer, ne pas requêter sans raison
+  Ecc: EccCapabilities!
+  OrganismeWallet: CRUDCapabilities!
+  Post: PostCapabilities!
+  PostCategory: CRUDCapabilities!
+  Provisionning: CRUDCapabilities!
+  Report: ReportCapabilities!
+  User: UserCapabilities!
+  UserGroup: CRUDCapabilities!
+  Abonnement: CRUDCapabilities!
+}
+
+input SendEmailAccountVerification {
+  email: String!
+}
+
+input SendPhoneNumberAccountVerification {
+  phone: PhoneInput!
+}
+
+input SendResetPasswordInput {
+  email: String!
+}
+
+input ShowCardInput {
+  id: ID!
+  redirectUrl: String!
+}
+
+input ShowPinInput {
+  id: ID!
+  redirectUrl: String!
+}
+
+input SigninInput {
+  email: String!
+  password: String!
+  tfaCode: String
+  deviceUid: ID
+}
+
+input SignupCreateAccountInput {
+  workflowId: ID
+  firstname: String!
+  lastname: String!
+  email: String!
+  acceptGCU: Boolean!
+  password: String!
+  passwordConfirmation: String!
+}
+
+input SignupCreateOrganismeInput {
+  name: String!
+  address: String
+  zipcode: String!
+  city: String
+  country: String!
+  indicatif: String!
+  effectif: Int!
+  abonnementType: OrganismeAbonnementType
+  codeParrainage: String
+}
+
+input SignupInput {
+  firstname: String!
+  lastname: String!
+  email: String!
+  acceptGCU: Boolean!
+  password: String!
+  passwordConfirmation: String!
+}
+
+type SignupInvitation {
+  id: ID!
+  organisme: Organisme!
+  invitedBy: MinimalistUser!
+  user: MinimalistUser!
+  # Si renseignée, l'utilisateur a déjà terminé l'on-boarding
+  userActivatedAt: DateTime
+  token: String!
+}
+
+input SignupInvitationInput {
+  organismeId: ID!
+  userId: ID!
+  token: String!
+}
+
+input SignupSetupPushInput {
+  deviceUid: ID!
+  pushEnabled: Boolean!
+  pushToken: String
+}
+
+input SignupValidateUserInformationsInput {
+  workflowId: ID
+  firstname: String!
+  lastname: String!
+  email: String!
+  acceptGCU: Boolean!
+}
+
+input SignupVerifyEmailInput {
+  userId: ID!
+  token: String!
+}
+
+input SignupVerifyPhoneNumberInput {
+  token: String!
+}
+
+# Information about pagination using a simple paginator.
+type SimplePaginatorInfo {
+  # Number of items in the current page.
+  count: Int!
+  # Index of the current page.
+  currentPage: Int!
+  # Index of the first item in the current page.
+  firstItem: Int
+  # Index of the last item in the current page.
+  lastItem: Int
+  # Number of items per page.
+  perPage: Int!
+  # Are there more pages after this one?
+  hasMorePages: Boolean!
+}
+
+type SondageContent implements PostContent {
+  id: ID
+  type: ContentType!
+  question: String!
+  sondageId: ID! @deprecated(reason: "29/09/2022 Use id")
+  endDate: DateTimeUtc!
+  anonymous: Boolean!
+  reponsesAfterEnd: Boolean!
+  propositions: [SondageProposition!]!
+  # Résultats disponible lorsque la date de fin est passée ou si utilisateur a
+  # répondu et qu'on veut voir les réponses immédiatement
+  resultats: [SondageResultat!]
+  userReponse: SondageReponse
+  # Participants disponibles lorsque la date de fin est passée et si non anonyme
+  participations(
+    pagination: OffsetPaginationInput
+  ): PaginatedSondageParticipations
+  capabilities: PostSondageContentCapability!
+}
+
+input SondageContentInput {
+  question: String!
+  endDate: DateTimeUtc!
+  anonymous: Boolean!
+  reponsesAfterEnd: Boolean!
+  propositions: [String!]!
+}
+
+type SondageParticipation {
+  user: MinimalistUser!
+}
+
+type SondageProposition {
+  id: ID!
+  value: String!
+}
+
+type SondageReponse {
+  id: ID!
+  proposition: SondageProposition!
+  user: MinimalistUser!
+}
+
+type SondageResultat {
+  propositionId: ID!
+  label: String!
+  value: Int!
+  pourcentage: Float!
+}
+
+# Directions for ordering a list of records.
+enum SortOrder {
+  # Sort records in ascending order.
+  ASC
+  # Sort records in descending order.
+  DESC
+}
+
+input StartWorkflowInput {
+  type: WorkflowType!
+}
+
+type Subscription {
+  workflowChanged(id: ID!): Workflow
+  postPublished(categoryId: ID): Post
+  postInteractions: PostInteractionsSubscription
+  walletsOrganismeWalletMvt: WalletsOrganismeWalletMvt
+  walletsUserWalletMvt: WalletsUserWalletMvt
+}
+
+# Specify if you want to include or exclude trashed results from a query.
+enum Trashed {
+  # Only return trashed results.
+  ONLY
+  # Return both trashed and non-trashed results.
+  WITH
+  # Only return non-trashed results.
+  WITHOUT
+}
+
+input UnlockPhysicalCardInput {
+  id: ID!
+  redirectUrl: String!
+}
+
+input UpdateCommentInput {
+  id: ID!
+  content: String!
+}
+
+input UpdateContactCategoryInput {
+  id: ID!
+  name: String!
+}
+
+input UpdateContactInput {
+  id: ID!
+  userId: ID
+  firstname: String!
+  lastname: String!
+  dateAnniversaire: String
+  fonction: String
+  categoryId: ID
+  lines: [ContactLineInput!]!
+}
+
+input UpdateContactPropertyInput {
+  id: ID!
+  label: String!
+  type: ContactPropertyType!
+}
+
+input UpdateMeInput {
+  firstname: String!
+  lastname: String!
+  avatarId: ID
+  incognito: Boolean
+  dateAnniversaire: String
+  fonction: String
+  about: String
+}
+
+input UpdateOrganismeInput {
+  id: ID!
+  name: String
+  address: String
+  zipcode: String
+  city: String
+  country: String
+  indicatif: String
+}
+
+input UpdatePostCategoryInput {
+  id: ID!
+  label: String!
+}
+
+input UpdatePostInput {
+  id: ID!
+  title: String
+  textContent: String
+  categoryId: ID
+  groupId: ID
+  content: PostContentInput
+  imageId: ID
+  publish: Boolean = true
+  publishedAt: DateTimeUtc
+}
+
+input UpdateUserGroupInput {
+  id: ID!
+  nom: String!
+}
+
+input UpdateUserInput {
+  id: ID!
+  firstname: String!
+  lastname: String!
+  email: String!
+  dateAnniversaire: String
+  fonction: String
+}
+
+# Can be used as an argument to upload files using https://github.com/jaydenseric/graphql-multipart-request-spec
+scalar Upload
+
+input UploadInput {
+  file: Upload!
+  targetType: MediaTargetType
+}
+
+type User {
+  id: ID!
+  firstname: String!
+  lastname: String!
+  # Capability READ nécessaire
+  status: UserStatus!
+  email: String!
+  # Capability READ nécessaire
+  phone: Phone
+  displayName: String!
+  avatar: Media!
+  # Capability READ nécessaire
+  dateAnniversaire: String
+  # Capability READ nécessaire
+  fonction: String
+  # Capability READ nécessaire
+  role: UserRole
+  # Capability READ nécessaire
+  groups: [UserGroup!]!
+  # Capability READ nécessaire
+  capabilities: UserCapabilities!
+  # Capability READ nécessaire
+  created_at: DateTime!
+  # Capability READ nécessaire
+  updated_at: DateTime!
+  carteVacances: UserCarteVacances!
+}
+
+type UserCapabilities {
+  read: Boolean!
+  create: Boolean!
+  createBatch: Boolean!
+  update: Boolean!
+  suspend: Boolean!
+  resume: Boolean!
+  delete: Boolean!
+  resendInvitation: Boolean!
+    @deprecated(reason: "12/01/23 Utiliser sendInvitation")
+  sendInvitation: Boolean!
+  changeRole: Boolean!
+  changeGroups: Boolean!
+}
+
+type UserCarteVacances {
+  abonnement: CarteVacancesAbonnement
+}
+
+input UserExecuteImportInput {
+  sendInvitation: Boolean!
+}
+
+type UserGroup {
+  id: ID!
+  nom: String!
+  code: String!
+  capabilities: CRUDCapabilities
+}
+
+enum UserRole {
+  USER
+  ADMIN
+  OWNER
+  GUEST
+}
+
+type UserSendInvitations {
+  count: Int!
+}
+
+input UsersInput {
+  inactive: Boolean
+  status: UserStatus
+  # Termes de recherche full-text
+  q: String
+  groupId: ID
+  carteVacances: CarteVacancesUsersInput
+}
+
+type UserStats {
+  count: Int!
+  toInvite: Int!
+}
+
+enum UserStatus {
+  CREATED
+  INVITED
+  ACTIVE
+  INACTIVE
+}
+
+scalar Void
+
+type WalletsAdvantage {
+  id: ID!
+  name: String!
+  typeDistribution: WalletsDistributionType!
+  shortDescription: String!
+  description: String!
+  image: Media!
+}
+
+input WalletsAllUserWalletsInput {
+  distributionTypes: [WalletsDistributionType!]
+  userId: ID
+}
+
+type WalletsDistribution {
+  id: ID!
+  nom: String!
+  reference: String
+  typeDistribution: WalletsDistributionType!
+  statut: WalletsDistributionStatut!
+  motifId: ID
+    @deprecated(
+      reason: "27/06/2022 Use `distribuables.WalletsDistributionMotif.id`"
+    )
+  motif: WalletsDistributionMotif
+    @deprecated(
+      reason: "27/06/2022 Use `distribuables.WalletsDistributionMotif`"
+    )
+  distribuables: [WalletsDistributionDistribuable!]!
+  dateDebut: DateTimeUtc!
+  dateFin: DateTimeUtc!
+  dateCloture: DateTimeUtc
+  conditionsUtilisation: String
+  montant: Price!
+  montantRemise: Price!
+  solde: Price!
+  pourcentageConsomme: Int!
+  montantRembourse: Price
+  cnt: Int!
+  secured: Boolean!
+  factureUrl: String
+  createdAt: DateTimeUtc!
+  updatedAt: DateTimeUtc!
+  capabilities: CRUDCapabilities!
+}
+
+type WalletsDistributionCarteConfig {
+  typeDistribuable: WalletsDistributionDistribuableType!
+}
+
+input WalletsDistributionCarteInput {
+  neant: Boolean
+}
+
+union WalletsDistributionDistribuable =
+    WalletsDistributionReductionRule
+  | WalletsDistributionRemboursementRule
+  | WalletsDistributionMotif
+  | WalletsDistributionCarteConfig
+enum WalletsDistributionDistribuableType {
+  MOTIF
+  REMBOURSEMENT
+  REDUCTION
+  CARTE
+}
+
+input WalletsDistributionInput {
+  nom: String!
+  typeDistribution: WalletsDistributionType!
+  motifId: ID
+  motif: WalletsDistributionMotifInput
+  reduction: WalletsDistributionReductionRuleInput
+  remboursement: WalletsDistributionRemboursementRuleInput
+  carte: WalletsDistributionCarteInput
+  dateDebut: DateTimeUtc!
+  dateFin: DateTimeUtc!
+  conditionsUtilisation: String
+  secured: Boolean!
+  variable: Boolean!
+  montantFixe: Price
+  mouvements: [WalletsDistributionMouvementInput!]
+  importId: ID
+}
+
+type WalletsDistributionMotif {
+  id: ID!
+  typeDistribuable: WalletsDistributionDistribuableType!
+  nom: String!
+  fontColor: WalletsDistributionMotifFontColor!
+  cover: Media
+  duree: Int!
+  dureeMax: Int!
+  conditionsUtilisation: String
+  produitPapierId: String
+}
+
+enum WalletsDistributionMotifFontColor {
+  LIGHT
+  DARK
+}
+
+input WalletsDistributionMotifInput {
+  id: ID!
+}
+
+input WalletsDistributionMouvementInput {
+  userId: ID!
+  montant: Price!
+}
+
+enum WalletsDistributionQuotaRenouvelable {
+  SEMAINE
+  MOIS
+  AUCUN
+}
+
+type WalletsDistributionQuotaRule {
+  quotaType: WalletsDistributionQuotaType!
+  quota: Price!
+  quotaRenouvelable: WalletsDistributionQuotaRenouvelable!
+}
+
+input WalletsDistributionQuotaRuleInput {
+  quotaType: WalletsDistributionQuotaType!
+  quota: Price!
+  quotaRenouvelable: WalletsDistributionQuotaRenouvelable!
+}
+
+enum WalletsDistributionQuotaType {
+  QUANTITE
+  MONTANT
+}
+
+type WalletsDistributionReductionRule {
+  typeDistribuable: WalletsDistributionDistribuableType!
+  subventionRule: WalletsDistributionSubventionRule!
+  quotaRule: WalletsDistributionQuotaRule
+  subventionnables: [WalletsDistributionSubventionnable!]!
+  catalogue: BonsplansCatalogue
+}
+
+input WalletsDistributionReductionRuleInput {
+  subventionRule: WalletsDistributionSubventionRuleInput!
+  allCatalogues: Boolean!
+  # Obligatoire si allCatalogues:false
+  catalogueId: ID
+  # Obligatoire si allCategories:false
+  allCategories: Boolean
+  # Obligatoire si allCategories:false
+  categorieIds: [ID!]
+  quotaRule: WalletsDistributionQuotaRuleInput
+}
+
+type WalletsDistributionRemboursementRule {
+  typeDistribuable: WalletsDistributionDistribuableType!
+  subventionRule: WalletsDistributionSubventionRule!
+}
+
+input WalletsDistributionRemboursementRuleInput {
+  subventionRule: WalletsDistributionSubventionRuleInput!
+}
+
+type WalletsDistributionSimulation {
+  solde: Price!
+  montantDistribution: Price!
+  montantRemise: Price!
+  nbrUsers: Int!
+}
+
+input WalletsDistributionSimulationInput {
+  # Obligatoire si l'on veut avoir l'info sur la remise
+  typeDistribution: WalletsDistributionType
+  variable: Boolean!
+  montantFixe: Price
+  mouvements: [WalletsDistributionMouvementInput!]
+  importId: ID
+}
+
+input WalletsDistributionsInput {
+  typeDistribution: WalletsDistributionType
+  statut: WalletsDistributionStatut
+  motifId: ID
+}
+
+type WalletsDistributionStats {
+  since: DateTimeUtc!
+  # Nombre de distributions
+  count: Int!
+  # Montant distribué, mais pas encore consommé par les utilisateurs
+  solde: Price!
+  # Montant distribué
+  montant: Price!
+  # Montant remboursé sous forme d'avoir à la clôture de distributions
+  montantRembourse: Price!
+  # Nombre de chèques cadeaux distribués (nombre de bénéficiaires)
+  walletCount: Int!
+}
+
+enum WalletsDistributionStatut {
+  BROUILLON
+  ATTENTE
+  PLANIFIE
+  DISTRIBUE
+  ANNULE
+  CLOTURE
+}
+
+type WalletsDistributionSubventionnable {
+  subventionnableType: WalletsDistributionSubventionnableType!
+  subventionnableId: ID!
+  subventionnableNom: String!
+}
+
+input WalletsDistributionSubventionnableInput {
+  subventionnableType: WalletsDistributionSubventionnableType!
+  subventionnableId: ID!
+}
+
+enum WalletsDistributionSubventionnableType {
+  CATALOGUE
+  CATEGORIE
+  PRODUIT
+}
+
+union WalletsDistributionSubventionRule =
+    WalletsDistributionSubventionRulePourcentage
+  | WalletsDistributionSubventionRuleFixe
+  | WalletsDistributionSubventionRuleCagnotte
+type WalletsDistributionSubventionRuleCagnotte {
+  typeSubventionRule: WalletsDistributionSubventionRuleType!
+}
+
+type WalletsDistributionSubventionRuleFixe {
+  typeSubventionRule: WalletsDistributionSubventionRuleType!
+  value: Price!
+}
+
+input WalletsDistributionSubventionRuleInput {
+  typeSubventionRule: WalletsDistributionSubventionRuleType!
+  # Obligatoire pour pourcentage ou fixe
+  value: Price
+}
+
+type WalletsDistributionSubventionRulePourcentage {
+  typeSubventionRule: WalletsDistributionSubventionRuleType!
+  value: Price!
+}
+
+enum WalletsDistributionSubventionRuleType {
+  POURCENTAGE
+  FIXE
+  CAGNOTTE
+}
+
+enum WalletsDistributionType {
+  CULTURE
+  ECC
+  SUBVENTION
+  VACANCES
+}
+
+type WalletsOrganismeConfig {
+  hasOrganismeWallet: Boolean!
+  hasCarteVacances: Boolean!
+  rembourserEccPerime: Boolean!
+}
+
+type WalletsOrganismeVirtualWallet {
+  solde: Price!
+  montantAttente: Price!
+  provisionningStats: WalletsProvisionningStats!
+  distributionStats: WalletsDistributionStats!
+}
+
+type WalletsOrganismeWallet {
+  id: ID!
+  nom: String!
+  solde: Price! @deprecated(reason: "04/08/2022 Use `sub.solde`")
+  montantAttente: Price!
+    @deprecated(reason: "04/08/2022 Use `sub.montantAttente`")
+  iban: String!
+  bic: String!
+  culture: WalletsOrganismeVirtualWallet!
+  ecc: WalletsOrganismeVirtualWallet!
+  sub: WalletsOrganismeVirtualWallet!
+  capabilities: CRUDCapabilities!
+  mouvements(pagination: OffsetPaginationInput): PaginatedWalletsMouvements
+}
+
+type WalletsOrganismeWalletMvt {
+  id: ID!
+  nom: String!
+  montant: Price!
+  solde: Price!
+  dateMvt: DateTimeUtc!
+}
+
+type WalletsPaiement {
+  url: String!
+  montant: Price!
+}
+
+type WalletsProvisionning {
+  id: ID!
+  nom: String
+  montant: Price!
+  montantAttente: Price!
+  montantRemise: Price!
+  typeProvisionning: WalletsProvisionningTypeProvisionning!
+  typePaiement: WalletsProvisionningTypePaiement!
+  statut: WalletsProvisionningStatut!
+  dateReception: DateTimeUtc
+  factureUrl: String
+  createdAt: DateTimeUtc!
+  updatedAt: DateTimeUtc!
+  organismeWallet: WalletsOrganismeWallet!
+  capabilities: CRUDCapabilities!
+}
+
+input WalletsProvisionningCultureInput {
+  nom: String
+  montant: Price!
+  typePaiement: WalletsProvisionningTypePaiement!
+}
+
+input WalletsProvisionningEccInput {
+  nom: String
+  typePaiement: WalletsProvisionningTypePaiement!
+  motifs: [WalletsProvisionningEccMotifsInput!]!
+}
+
+input WalletsProvisionningEccMotifsInput {
+  id: ID!
+  montant: Price!
+}
+
+input WalletsProvisionningInput {
+  nom: String
+  montant: Price!
+  typeProvisionning: WalletsProvisionningTypeProvisionning
+  typePaiement: WalletsProvisionningTypePaiement!
+}
+
+input WalletsProvisionningsInput {
+  typeProvisionning: WalletsProvisionningTypeProvisionning
+  typePaiement: WalletsProvisionningTypePaiement
+  statut: WalletsProvisionningStatut
+}
+
+type WalletsProvisionningStats {
+  since: DateTimeUtc!
+  # Nombre de provisionnings
+  count: Int!
+  # Montant total de provisionnings encaissés
+  montant: Price!
+  montantRemise: Price!
+}
+
+enum WalletsProvisionningStatut {
+  ATTENTE
+  RECU
+  ANNULE
+}
+
+input WalletsProvisionningSubInput {
+  nom: String
+  montant: Price!
+  typePaiement: WalletsProvisionningTypePaiement!
+}
+
+enum WalletsProvisionningTypePaiement {
+  CHEQUE
+  VIREMENT
+  ONLINE
+}
+
+enum WalletsProvisionningTypeProvisionning {
+  CULTURE
+  ECC
+  SUB
+}
+
+input WalletsUserActivateWalletInput {
+  id: ID!
+  activationCode: String!
+}
+
+input WalletsUserPartageWalletInput {
+  userWalletId: ID!
+  montant: Price!
+  firstname: String!
+  lastname: String!
+  email: String!
+}
+
+type WalletsUserPersonalWallet {
+  id: ID!
+  solde: Price!
+}
+
+input WalletsUserSendActivationCodeInput {
+  id: ID!
+}
+
+type WalletsUserWallet {
+  id: ID!
+  nom: String!
+  user: MinimalistUser!
+  distributionId: Int!
+  montantInitial: Price!
+  solde: Price!
+  used: Boolean!
+  usedAt: DateTimeUtc
+  nbrRelances: Int!
+  actif: Boolean!
+  statut: WalletsUserWalletStatut!
+  pourcentageConsomme: Int!
+  distribution: WalletsUserWalletDistribution!
+  capabilities: WalletsUserWalletCapabilities!
+  vedetteEmplacement: MisesEnAvantVedetteEmplacement
+  espace: BonsplansEspace!
+  quota: WalletsUserWalletQuota
+}
+
+type WalletsUserWalletCapabilities {
+  share: Boolean!
+  use: Boolean!
+}
+
+type WalletsUserWalletDistribution {
+  id: ID!
+  nom: String!
+  typeDistribution: WalletsDistributionType!
+  motifId: ID
+    @deprecated(
+      reason: "27/06/2022 Use `distribuables.WalletsDistributionMotif.id`"
+    )
+  motif: WalletsDistributionMotif
+    @deprecated(
+      reason: "27/06/2022 Use `distribuables.WalletsDistributionMotif`"
+    )
+  distribuables: [WalletsDistributionDistribuable!]!
+  dateDebut: DateTimeUtc!
+  dateFin: DateTimeUtc!
+  conditionsUtilisation: String
+}
+
+type WalletsUserWalletMvt {
+  id: ID!
+  nom: String!
+  montant: Price!
+  solde: Price!
+  walletId: Int!
+  dateMvt: DateTimeUtc!
+}
+
+type WalletsUserWalletPartage {
+  id: ID!
+  nom: String!
+  montant: Price!
+  datePartage: DateTimeUtc!
+}
+
+type WalletsUserWalletQuota {
+  id: ID!
+  quotaRule: WalletsDistributionQuotaRule!
+  quotaConsomme: Price!
+  dateDebut: DateTimeUtc
+  dateFin: DateTimeUtc
+}
+
+input WalletsUserWalletsInput {
+  distributionType: WalletsDistributionType
+  distributionTypes: [WalletsDistributionType!]
+}
+
+enum WalletsUserWalletStatut {
+  CONSOMME
+  NON_CONSOMME
+  PARTIELLEMENT_CONSOMME
+  ATTENTE
+}
+
+type Workflow {
+  id: ID!
+  type: WorkflowType!
+  steps: [WorkflowStep!]!
+}
+
+type WorkflowStep {
+  action: ID!
+  done: Boolean!
+}
+
+enum WorkflowType {
+  SIGNUP
+  CHANGE_EMAIL
+  CHANGE_PASSWORD
+  CHANGE_PHONE_NUMBER
+  FIRST_CONNECTION
+  TUNNEL_COMMANDE_CA
+  TUNNEL_COMMANDE_ECC
+}
+
