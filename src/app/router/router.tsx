@@ -1,13 +1,9 @@
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import AuthRequired from '../auth-required/auth-required';
 import Login from '../login/login';
-import Logout from '../logout/logout';
 import Post from '../post/post';
 
-/* eslint-disable-next-line */
-export interface RouterProps {}
-
-export function Router(props: RouterProps) {
+export function Router() {
   const router = createBrowserRouter([
     {
       path: '/',
@@ -22,10 +18,6 @@ export function Router(props: RouterProps) {
     {
       path: 'login',
       element: <Login />,
-    },
-    {
-      path: 'logout',
-      element: <Logout />,
     },
   ]);
   return <RouterProvider router={router} />;

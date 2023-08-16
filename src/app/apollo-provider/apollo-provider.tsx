@@ -33,9 +33,7 @@ export function ApolloProvider(props: ApolloProviderProps) {
       link: authLink.concat(httpLink),
       cache: new InMemoryCache({
         typePolicies: {
-          PaginatedPosts: {
-            
-          }
+          PaginatedPosts: {},
         },
       }),
     });

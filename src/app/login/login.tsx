@@ -1,20 +1,18 @@
+import { useEffect } from 'react';
 import { Button, Container, Form, Row, Spinner } from 'react-bootstrap';
+import { useMutation } from '@apollo/client';
 import styles from './login.module.scss';
 import useLogin from './use-login/use-login';
-import { useMutation } from '@apollo/client';
 import SIGNIN_DOCUMENT from './login.graphql';
 import { AuthResponse } from 'src/gql/graphql';
-import { useEffect } from 'react';
 import AuthProvider from '../auth-provider/auth-provider';
 
-/* eslint-disable-next-line */
-export interface LoginProps {}
-
-export function Login(props: LoginProps) {
+export function Login() {
   const { loginErrors, onSingIn, loginRegister, onSignedOn } = useLogin();
   const [mutate, { data: signInData, loading, error }] = useMutation<{
     signin: AuthResponse;
   }>(SIGNIN_DOCUMENT);
+
   const onSubmit = onSingIn((data) =>
     mutate({
       variables: {
@@ -27,8 +25,7 @@ export function Login(props: LoginProps) {
       console.log(signInData.signin);
       onSignedOn(signInData.signin);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [signInData]);
+  }, [signInData, onSignedOn]);
 
   return (
     <AuthProvider>

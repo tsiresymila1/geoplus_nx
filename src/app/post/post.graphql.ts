@@ -104,12 +104,14 @@ export const GET_POST_DOCUMENT = gql`
               create
             }
           }
-        }
+        },
+        publishedAt
       }
       pagination {
         count
         offset
-        limit
+        limit,
+        total
       }
     }
   }

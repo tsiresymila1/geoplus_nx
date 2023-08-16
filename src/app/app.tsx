@@ -1,4 +1,3 @@
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import ApolloProvider from './apollo-provider/apollo-provider';
 import Router from './router/router';
 import 'bootstrap/dist/css/bootstrap.min.css';

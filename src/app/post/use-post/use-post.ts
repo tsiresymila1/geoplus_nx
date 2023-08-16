@@ -1,66 +1,59 @@
-import { useMutation } from '@apollo/client';
-import { FieldErrors, UseFormRegister, useForm } from 'react-hook-form';
-import { CREATE_POST_DOCUMENT } from '../post.graphql';
+import { useQuery } from '@apollo/client';
+import { GET_POST_DOCUMENT } from '../post.graphql';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { PaginatedPosts, QueryPostsArgs } from 'src/gql/graphql';
 
-// eslint-disable-next-line @typescript-eslint/no-empty-interface
 export interface UsePost {
-  register: UseFormRegister<PostValue>;
-  errors: FieldErrors<PostValue>;
-  onCreatingPost: boolean;
-  onSubmit: (e?: React.BaseSyntheticEvent<object> | undefined) => void;
+  pageCount: number;
+  pageDisabled: number;
+  onPaginate: (p: number) => void;
+  data?: { posts: PaginatedPosts };
+  loading: boolean;
 }
 
-export type PostValue = {
-  textContent: string;
-};
-
 export function usePost(): UsePost {
-  const {
-    register,
-    handleSubmit,
-    reset,
-    formState: { errors },
-  } = useForm<PostValue>();
-
-  const [createPost, { loading }] = useMutation(CREATE_POST_DOCUMENT);
-
-  const onSubmit = handleSubmit((data) =>
-    createPost({
+  const [limit] = useState<number>(12);
+  const [offset, setOffset] = useState<number>(0);
+  const { data, loading } = useQuery<{ posts: PaginatedPosts }, QueryPostsArgs>(
+    GET_POST_DOCUMENT,
+    {
       variables: {
-        input: data,
+        pagination: {
+          offset,
+          limit,
+        },
       },
-      update(cache, { data: { createPost } }) {
-        const id = cache.identify(createPost);
-        cache.modify({
-          fields: {
-            posts(existingPostRefs, { toReference }) {
-              const newData = [
-                toReference(createPost),
-                ...existingPostRefs['data'],
-              ];
-              console.log(
-                'existingPostRefs >>>>',
-                id,
-                toReference(createPost),
-                newData
-              );
-              return {
-                ...existingPostRefs,
-                data: newData,
-              };
-            },
-          },
-        });
-      },
-    }).then(() => {
-      reset();
-    })
+    }
   );
+  const pageCount = useMemo(() => {
+    return Math.max(1, Math.ceil((data?.posts.pagination.total ?? 0) / limit));
+  }, [data, limit]);
+
+  const pageDisabled = useMemo(
+    () => Math.ceil(offset / limit),
+    [offset, limit]
+  );
+
+  const onPaginate = useCallback(
+    (page: number) => {
+      console.log('Paginate >>>', page * limit);
+      setOffset(page * limit);
+    },
+    [limit]
+  );
+
+  useEffect(() => {
+    if (data && data?.posts.pagination.offset >= data?.posts.pagination.total) {
+      setOffset(Math.max(0, offset - limit));
+    }
+  }, [data, limit, offset]);
+
   return {
-    register,
-    errors,
-    onCreatingPost: loading,
-    onSubmit,
+    pageCount,
+    onPaginate,
+    data,
+    loading,
+    pageDisabled,
   };
 }
 

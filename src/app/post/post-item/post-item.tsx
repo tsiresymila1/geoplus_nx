@@ -1,10 +1,10 @@
 import { Post } from 'src/gql/graphql';
+import moment from 'moment';
 import { Button, Card, Spinner } from 'react-bootstrap';
-import { Reference, useMutation } from '@apollo/client';
+import { useMutation } from '@apollo/client';
 import DELETE_POST_DOCUMENT from './post-item.graphql';
 import { useCallback } from 'react';
-
-/* eslint-disable-next-line */
+import { GET_POST_DOCUMENT } from '../post.graphql';
 export interface PostItemProps {
   post: Post;
 }
@@ -19,28 +19,9 @@ export function PostItem({ post }: PostItemProps) {
           id: post.id,
         },
       },
-      // use update or refetch query
-      update(cache, { data: { deletePost } }) {
-        cache.modify({
-          fields: {
-            posts(existingPostRefs, { toReference }) {
-              const newData = [
-                ...existingPostRefs['data'].filter(
-                  (d: Reference | undefined) =>
-                    d?.__ref !== toReference(deletePost)?.__ref
-                ),
-              ];
-              return {
-                ...existingPostRefs,
-                data: newData,
-              };
-            },
-          },
-        });
-      },
+      refetchQueries: [GET_POST_DOCUMENT],
     });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [post]);
+  }, [post, deletePost]);
 
   return (
     <Card style={{ width: '18rem' }}>
@@ -48,10 +29,16 @@ export function PostItem({ post }: PostItemProps) {
       <Card.Body>
         <Card.Title>{post.category?.label}</Card.Title>
         <Card.Text>{post.textContent}</Card.Text>
+        <div>
+          <b>{post.author.displayName} - </b>
+          {moment(post.publishedAt).format('YYYY-MM-DD HH:mm')}
+        </div>
+      </Card.Body>
+      <Card.Footer className="justify-content-end d-flex">
         <Button variant="primary" onClick={deletePostItem}>
           Delete {loading && <Spinner size="sm" />}
         </Button>
-      </Card.Body>
+      </Card.Footer>
     </Card>
   );
 }
