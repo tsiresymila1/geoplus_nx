@@ -24,6 +24,7 @@ export function Post() {
                   <button
                     disabled={e === pageDisabled}
                     className="btn btn-primary"
+                    key={e}
                     onClick={() => onPaginate(e)}
                   >
                     {e + 1}

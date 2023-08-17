@@ -1,6 +1,5 @@
-import { useMutation } from '@apollo/client';
 import { FieldErrors, UseFormRegister, useForm } from 'react-hook-form';
-import { CREATE_POST_DOCUMENT, GET_POST_DOCUMENT } from '../post.graphql';
+import { useCreatePostMutation } from 'src/gql/graphql';
 
 
 export interface UseCreatePost {
@@ -22,14 +21,14 @@ export function useCreatePost(): UseCreatePost {
     formState: { errors },
   } = useForm<PostValue>();
 
-  const [createPost, { loading }] = useMutation(CREATE_POST_DOCUMENT);
+  const [createPost, { loading }] = useCreatePostMutation();
 
   const onSubmit = handleSubmit((data) =>
     createPost({
       variables: {
         input: data,
       },
-      refetchQueries: [GET_POST_DOCUMENT],
+      refetchQueries: ["posts"],
     }).then(() => {
       reset();
     })

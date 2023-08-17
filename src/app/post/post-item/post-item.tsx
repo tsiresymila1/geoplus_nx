@@ -1,16 +1,13 @@
-import { Post } from 'src/gql/graphql';
+import { Post, useDeletePostMutation } from 'src/gql/graphql';
 import moment from 'moment';
 import { Button, Card, Spinner } from 'react-bootstrap';
-import { useMutation } from '@apollo/client';
-import DELETE_POST_DOCUMENT from './post-item.graphql';
 import { useCallback } from 'react';
-import { GET_POST_DOCUMENT } from '../post.graphql';
 export interface PostItemProps {
   post: Post;
 }
 
 export function PostItem({ post }: PostItemProps) {
-  const [deletePost, { loading }] = useMutation(DELETE_POST_DOCUMENT);
+  const [deletePost, { loading }] = useDeletePostMutation();
 
   const deletePostItem = useCallback(async () => {
     deletePost({
@@ -19,7 +16,7 @@ export function PostItem({ post }: PostItemProps) {
           id: post.id,
         },
       },
-      refetchQueries: [GET_POST_DOCUMENT],
+      refetchQueries: ['posts'],
     });
   }, [post, deletePost]);
 
